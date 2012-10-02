@@ -40,27 +40,39 @@ describe 'adapting structs into mongo' do
       end
     end
 
-    describe 'update an existing model' do
+    describe 'with an existing model' do
       let(:model) { klass.new 'Test Model','Some Data' }
-      let(:data)  { collection.find({}).to_a[-1] }
+      let(:id)    { collection.insert({ :name => 'My Model', :other => 'Some Value' },{ :safe => true }) }
 
       before do
-        model.id = collection.insert({ :name => 'My Model', :other => 'Some Value' },{ :safe => true })
+        model.id = id
       end
 
-      subject { adaptor.update model }
+      describe 'to update it' do
+        let(:data)  { collection.find({}).to_a[-1] }
 
-      it 'doesnt change the number of items in the collection' do
-        expect { subject }.to change { collection.size }.by(0)
+        subject { adaptor.update model }
+
+        it 'doesnt change the number of items in the collection' do
+          expect { subject }.to change { collection.size }.by(0)
+        end
+        it 'doesnt change the id' do
+          expect { subject }.to_not change { collection.find_one['_id'] }
+        end
+        it 'sets my fields and values' do
+          subject
+          data['_id'].should == model.id
+          data['name'].should  == 'Test Model'
+          data['other'].should == 'Some Data'
+        end
       end
-      it 'doesnt change the id' do
-        expect { subject }.to_not change { collection.find_one['_id'] }
-      end
-      it 'sets my fields and values' do
-        subject
-        data['_id'].should == model.id
-        data['name'].should  == 'Test Model'
-        data['other'].should == 'Some Data'
+
+      describe 'to fetch it' do
+        subject { adaptor.fetch({ :_id => id }) }
+        it          { should be_a klass }
+        its(:id)    { should == id }
+        its(:name)  { should == 'My Model' }
+        its(:other) { should == 'Some Value' }
       end
     end
   end
