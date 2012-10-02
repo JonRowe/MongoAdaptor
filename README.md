@@ -1,6 +1,6 @@
 # MongoAdaptor
 
-TODO: Write a gem description
+A simple mongo handler. Translates Structs into Mongo and back.
 
 ## Installation
 
