@@ -22,11 +22,11 @@ class MongoAdaptor
   end
 
   def fetch(*args)
-    @collection.find_one *args, :transformer => builder
+    @collection.find_one *(args + [{ :transformer => builder }])
   end
 
   def find(*args)
-    @collection.find *args, :transformer => builder
+    @collection.find *(args + [{ :transformer => builder }])
   end
 
   private
