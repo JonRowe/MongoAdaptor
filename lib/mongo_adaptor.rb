@@ -19,7 +19,7 @@ class MongoAdaptor
   end
 
   def insert(model)
-    @collection.insert( process(model), { safe: true } )
+    @collection.insert( process(model), { :safe => true } )
   end
 
   private
