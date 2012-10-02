@@ -25,6 +25,10 @@ class MongoAdaptor
     @collection.find_one *args, transformer: builder
   end
 
+  def find(*args)
+    @collection.find *args, transformer: builder
+  end
+
   private
     def builder
       proc do |result|

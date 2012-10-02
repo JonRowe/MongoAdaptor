@@ -75,5 +75,26 @@ describe 'adapting structs into mongo' do
         its(:other) { should == 'Some Value' }
       end
     end
+
+    describe 'finding multiples' do
+      before do
+        3.times do |i|
+          collection.insert({ :name => 'My Model', :other => i },{ :safe => true })
+        end
+        3.times do |i|
+          collection.insert({ :name => 'Other Model', :other => i },{ :safe => true })
+        end
+      end
+
+      subject { adaptor.find({ :name => 'My Model' }) }
+
+      its(:count) { should == 3 }
+      it 'translates all to klass' do
+        subject.all? { |k| k.is_a? klass }.should be_true
+      end
+      it 'gets them all' do
+        subject.map(&:other).should == [0,1,2]
+      end
+    end
   end
 end
