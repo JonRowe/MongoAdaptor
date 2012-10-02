@@ -21,6 +21,11 @@ Or install it yourself as:
 
 TODO: Write usage instructions here
 
+## Caveats
+
+Tests don't pass on Rubinus in 19 mode. Not sure why (some BSON encoding
+issue?)
+
 ## Contributing
 
 1. Fork it
