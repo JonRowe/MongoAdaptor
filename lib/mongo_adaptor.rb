@@ -33,7 +33,7 @@ class MongoAdaptor
     def builder
       proc do |result|
         @klass.new.tap do |model|
-          model[:id] = result.delete '_id' if model.respond_to? :id
+          model[:id] = result.delete('_id') if model.respond_to?(:id)
           result.each do |field,value|
             model[field] = value if model.respond_to? field
           end
