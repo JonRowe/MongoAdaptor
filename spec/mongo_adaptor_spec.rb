@@ -45,7 +45,7 @@ describe 'adapting structs into mongo' do
       let(:data)  { collection.find({}).to_a[-1] }
 
       before do
-        model.id = collection.insert({ :name => 'My Model', :other => 'Some Value' })
+        model.id = collection.insert({ :name => 'My Model', :other => 'Some Value' },{ :safe => true })
       end
 
       subject { adaptor.update model }
