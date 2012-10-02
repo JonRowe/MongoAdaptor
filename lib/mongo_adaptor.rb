@@ -14,18 +14,18 @@ class MongoAdaptor
     @klass = klass
   end
 
-  def primary_key
-    "_id"
-  end
-
   def insert(model)
     @collection.insert( process(model), { :safe => true } )
   end
+  def update(model)
+    @collection.update( { "_id" => model.id }, { "$set" => process(model) }, { :safe => true, :upsert => false } )
+  end
+
 
   private
     def process(model)
       fields = {}
-      model.each_pair { |field,value| fields[field] = value unless field == primary_key.to_sym }
+      model.each_pair { |field,value| fields[field] = value unless field == :id }
       fields
     end
 end
