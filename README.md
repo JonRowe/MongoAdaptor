@@ -1,3 +1,4 @@
+[![Build Status](https://secure.travis-ci.org/JonRowe/MongoAdaptor.png)](http://travis-ci.org/JonRowe/MongoAdaptor)
 # MongoAdaptor
 
 A simple mongo handler. Translates Structs into Mongo and back.
