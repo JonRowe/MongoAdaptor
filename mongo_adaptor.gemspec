@@ -17,6 +17,7 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'mongo'
   gem.add_dependency 'bson'
+  gem.add_dependency 'mongo-configure'
 
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'

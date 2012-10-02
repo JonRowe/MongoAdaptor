@@ -1,5 +1,11 @@
+require 'mongo'
+require 'mongo-configure'
 require "mongo_adaptor/version"
 
-module MongoAdaptor
-  # Your code goes here...
+class MongoAdaptor
+  class << self
+    def db
+      @db ||= Mongo::Configure.current.load
+    end
+  end
 end
