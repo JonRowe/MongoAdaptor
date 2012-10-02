@@ -14,4 +14,10 @@ Gem::Specification.new do |gem|
   gem.name          = "mongo_adaptor"
   gem.require_paths = ["lib"]
   gem.version       = MongoAdaptor::VERSION
+
+  gem.add_dependency 'mongo'
+  gem.add_dependency 'bson'
+
+  gem.add_development_dependency 'rake'
+  gem.add_development_dependency 'rspec'
 end
