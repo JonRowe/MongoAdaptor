@@ -35,7 +35,7 @@ class MongoAdaptor
         @klass.new.tap do |model|
           model[:id] = result.delete('_id') if model.respond_to?(:id)
           result.each do |field,value|
-            model[field] = value if model.members.include? field.to_sym
+            model[field] = value if model.members.map(&:to_s).include?(field.to_s)
           end
         end
       end
