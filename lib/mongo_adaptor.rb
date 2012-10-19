@@ -17,6 +17,9 @@ class MongoAdaptor
   def insert(model)
     @collection.insert( process(model), { :safe => true } )
   end
+  def upsert(model, query = { "_id" => model.id })
+    @collection.update( query, { "$set" => process(model) }, { :safe => true, :upsert => true } )
+  end
   def update(model)
     @collection.update( { "_id" => model.id }, { "$set" => process(model) }, { :safe => true, :upsert => false } )
   end

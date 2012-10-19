@@ -19,24 +19,33 @@ describe 'adapting structs into mongo' do
     let(:adaptor)    { MongoAdaptor.new 'test_collection', klass }
     let(:collection) { Mongo::Configure.current.load.collection 'test_collection' }
 
-    describe 'to insert a blank model' do
+    describe 'with a new model' do
       let(:model) { klass.new 'Test Model','Some Data','fake key'  }
       let(:data)  { collection.find({}).to_a[-1] }
 
-      subject { adaptor.insert model }
+      shared_examples_for 'new model' do
+        it 'changes the number of items in the collection' do
+          expect { subject }.to change { collection.size }.by(1)
+        end
+        it 'generates an _id, ignoring any set key' do
+          subject
+          data['_id'].should be_a BSON::ObjectId
+          data['id'].should be_nil
+        end
+        it 'sets my fields and values' do
+          subject
+          data['name'].should  == 'Test Model'
+          data['other'].should == 'Some Data'
+        end
+      end
 
-      it 'changes the number of items in the collection' do
-        expect { subject }.to change { collection.size }.by(1)
+      context 'inserting' do
+        subject { adaptor.insert model }
+        it_should_behave_like 'new model'
       end
-      it 'generates an _id, ignoring any set key' do
-        subject
-        data['_id'].should be_a BSON::ObjectId
-        data['id'].should be_nil
-      end
-      it 'sets my fields and values' do
-        subject
-        data['name'].should  == 'Test Model'
-        data['other'].should == 'Some Data'
+      context 'upserting' do
+        subject { adaptor.upsert model, {} }
+        it_should_behave_like 'new model'
       end
     end
 
@@ -48,10 +57,8 @@ describe 'adapting structs into mongo' do
         model.id = id
       end
 
-      describe 'to update it' do
+      shared_examples_for 'modifying an existing model' do
         let(:data)  { collection.find({}).to_a[-1] }
-
-        subject { adaptor.update model }
 
         it 'doesnt change the number of items in the collection' do
           expect { subject }.to change { collection.size }.by(0)
@@ -65,6 +72,16 @@ describe 'adapting structs into mongo' do
           data['name'].should  == 'Test Model'
           data['other'].should == 'Some Data'
         end
+      end
+
+      describe 'to update it' do
+        subject { adaptor.update model }
+        it_should_behave_like 'modifying an existing model'
+      end
+
+      describe 'to upsert it' do
+        subject { adaptor.upsert model, { name: 'My Model' } }
+        it_should_behave_like 'modifying an existing model'
       end
 
       describe 'to fetch it' do
