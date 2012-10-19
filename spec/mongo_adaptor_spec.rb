@@ -80,7 +80,7 @@ describe 'adapting structs into mongo' do
       end
 
       describe 'to upsert it' do
-        subject { adaptor.upsert model, { name: 'My Model' } }
+        subject { adaptor.upsert model, { :name => 'My Model' } }
         it_should_behave_like 'modifying an existing model'
       end
 
