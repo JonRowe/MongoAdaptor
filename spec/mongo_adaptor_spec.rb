@@ -15,12 +15,12 @@ describe 'adapting structs into mongo' do
   end
 
   describe 'useing the adaptor' do
-    let(:klass)      { Struct.new :name, :other, :id }
+    let(:klass)      { Struct.new :name, :other, :members, :id }
     let(:adaptor)    { MongoAdaptor.new 'test_collection', klass }
     let(:collection) { Mongo::Configure.current.load.collection 'test_collection' }
 
     describe 'with a new model' do
-      let(:model) { klass.new 'Test Model','Some Data','fake key'  }
+      let(:model) { klass.new 'Test Model','Some Data','Some Members','fake key'  }
       let(:data)  { collection.find({}).to_a[-1] }
 
       shared_examples_for 'new model' do
@@ -36,6 +36,7 @@ describe 'adapting structs into mongo' do
           subject
           data['name'].should  == 'Test Model'
           data['other'].should == 'Some Data'
+          data['members'].should == 'Some Members'
         end
       end
 
@@ -50,8 +51,8 @@ describe 'adapting structs into mongo' do
     end
 
     describe 'with an existing model' do
-      let(:model) { klass.new 'Test Model','Some Data' }
-      let(:id)    { collection.insert({ :name => 'My Model', :other => 'Some Value' },{ :safe => true }) }
+      let(:model) { klass.new 'Test Model','Some Data','Some Members' }
+      let(:id)    { collection.insert({ :name => 'My Model', :other => 'Some Value', :members => 'Some Members' },{ :safe => true }) }
 
       before do
         model.id = id
@@ -71,6 +72,7 @@ describe 'adapting structs into mongo' do
           data['_id'].should == model.id
           data['name'].should  == 'Test Model'
           data['other'].should == 'Some Data'
+          data['members'].should == 'Some Members'
         end
       end
 
@@ -86,10 +88,11 @@ describe 'adapting structs into mongo' do
 
       describe 'to fetch it' do
         subject { adaptor.fetch({ :_id => id }) }
-        it          { should be_a klass }
-        its(:id)    { should == id }
-        its(:name)  { should == 'My Model' }
-        its(:other) { should == 'Some Value' }
+        it            { should be_a klass }
+        its(:id)      { should == id }
+        its(:name)    { should == 'My Model' }
+        its(:other)   { should == 'Some Value' }
+        its(:members) { should == 'Some Members' }
       end
     end
 
