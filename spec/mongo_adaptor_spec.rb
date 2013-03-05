@@ -94,6 +94,13 @@ describe 'adapting structs into mongo' do
         its(:other)   { should == 'Some Value' }
         its(:members) { should == 'Some Members' }
       end
+
+      describe 'to remove it' do
+        it 'removes the document matching the selector' do
+          adaptor.remove({ :_id => id })
+          adaptor.fetch({ :_id => id }).should be_nil
+        end
+      end
     end
 
     describe 'finding multiples' do

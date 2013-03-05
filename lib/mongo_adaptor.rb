@@ -27,6 +27,9 @@ class MongoAdaptor
   def fetch(*args)
     @collection.find_one *(args + [{ :transformer => builder }])
   end
+  def remove(*args)
+    @collection.remove *args
+  end
 
   def find(*args)
     @collection.find *(args + [{ :transformer => builder }])
