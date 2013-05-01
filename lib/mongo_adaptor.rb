@@ -26,16 +26,16 @@ class MongoAdaptor
     @collection.update query, set(process(model)), safe_mode.merge(upsert_mode false)
   end
 
-  def fetch(*args)
-    @collection.find_one *(args + [{ :transformer => builder }])
+  def fetch selector = {}, opts = {}
+    @collection.find_one selector, opts.merge( :transformer => builder )
   end
 
   def remove selector = {}, opts = {}
     @collection.remove selector, opts
   end
 
-  def find(*args)
-    @collection.find *(args + [{ :transformer => builder }])
+  def find selector = {}, opts = {}
+    @collection.find selector, opts.merge( :transformer => builder )
   end
 
   private
