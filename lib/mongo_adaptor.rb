@@ -26,7 +26,7 @@ class MongoAdaptor
     @collection.update query, set(process(model)), safe_mode.merge(upsert_mode false)
   end
 
-  def fetch selector = {}, opts = {}
+  def fetch selector = {}, opts = { :fields => fields }
     @collection.find_one selector, opts.merge( :transformer => builder )
   end
 
@@ -34,7 +34,7 @@ class MongoAdaptor
     @collection.remove selector, opts
   end
 
-  def find selector = {}, opts = {}
+  def find selector = {}, opts = { :fields => fields }
     @collection.find selector, opts.merge( :transformer => builder )
   end
 
@@ -45,10 +45,14 @@ class MongoAdaptor
         @klass.new.tap do |model|
           model[:id] = result.delete('_id') if model.respond_to?(:id)
           result.each do |field,value|
-            model[field] = value if model.class.members.map(&:to_s).include?(field.to_s)
+            model[field] = value if fields.include?(field.to_s)
           end
         end
       end
+    end
+
+    def fields
+      @fields ||= @klass.members.map(&:to_s)
     end
 
     def process(model)
@@ -58,7 +62,7 @@ class MongoAdaptor
     end
 
     def safe_mode
-      { :safe => true }
+      { :w => 1 }
     end
 
     def upsert_mode level
