@@ -123,7 +123,7 @@ describe 'adapting structs into mongo' do
         subject.map(&:other).should == [0,1,2]
       end
       it 'will pass along options' do
-        expect { adaptor.find({ :name => 'My Model' },{ fields: { }}) }.to_not raise_error
+        expect { adaptor.find({ :name => 'My Model' },{ :fields => { }}) }.to_not raise_error
       end
     end
   end
