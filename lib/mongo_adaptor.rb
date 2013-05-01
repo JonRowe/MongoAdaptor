@@ -52,7 +52,7 @@ class MongoAdaptor
     end
 
     def fields
-      @fields ||= @klass.members.map(&:to_s)
+      @fields ||= @klass.members.map(&:to_s) if @klass
     end
 
     def process(model)
