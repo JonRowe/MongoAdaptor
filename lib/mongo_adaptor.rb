@@ -9,26 +9,29 @@ class MongoAdaptor
     end
   end
 
-  def initialize(name,klass)
+  def initialize name, klass
     @collection = self.class.db.collection name.to_s.downcase
     @klass = klass
   end
 
-  def insert(model)
-    @collection.insert( process(model), { :safe => true } )
+  def insert model
+    @collection.insert process(model), safe_mode
   end
-  def upsert(model, query = { "_id" => model.id })
-    @collection.update( query, { "$set" => process(model) }, { :safe => true, :upsert => true } )
+
+  def upsert model, query = { "_id" => model.id }
+    @collection.update query, set(process(model)), safe_mode.merge(upsert_mode true)
   end
-  def update(model)
-    @collection.update( { "_id" => model.id }, { "$set" => process(model) }, { :safe => true, :upsert => false } )
+
+  def update model, query = { "_id" => model.id }
+    @collection.update query, set(process(model)), safe_mode.merge(upsert_mode false)
   end
 
   def fetch(*args)
     @collection.find_one *(args + [{ :transformer => builder }])
   end
-  def remove(*args)
-    @collection.remove *args
+
+  def remove selector = {}, opts = {}
+    @collection.remove selector, opts
   end
 
   def find(*args)
@@ -36,6 +39,7 @@ class MongoAdaptor
   end
 
   private
+
     def builder
       proc do |result|
         @klass.new.tap do |model|
@@ -46,9 +50,23 @@ class MongoAdaptor
         end
       end
     end
+
     def process(model)
       fields = {}
       model.each_pair { |field,value| fields[field] = value unless field == :id }
       fields
     end
+
+    def safe_mode
+      { :safe => true }
+    end
+
+    def upsert_mode level
+      { :upsert => level }
+    end
+
+    def set query
+      { "$set" => query }
+    end
+
 end

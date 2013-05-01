@@ -14,7 +14,7 @@ describe 'adapting structs into mongo' do
     end
   end
 
-  describe 'useing the adaptor' do
+  describe 'using the adaptor' do
     let(:klass)      { Struct.new :name, :other, :members, :id }
     let(:adaptor)    { MongoAdaptor.new 'test_collection', klass }
     let(:collection) { Mongo::Configure.current.load.collection 'test_collection' }
