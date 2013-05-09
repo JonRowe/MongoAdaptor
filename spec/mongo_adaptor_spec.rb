@@ -100,6 +100,10 @@ describe 'adapting structs into mongo' do
           subject
           data['members'].should == ['Some Members','Some Other Members']
         end
+        it 'also can execute my command by query' do
+          adaptor.execute({ "name" => 'My Model'}, "$addToSet" => { "members" => "Some Other Members" })
+          data['members'].should == ['Some Members','Some Other Members']
+        end
       end
 
       describe 'to fetch it' do

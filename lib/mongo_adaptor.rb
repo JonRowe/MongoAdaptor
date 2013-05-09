@@ -26,8 +26,12 @@ class MongoAdaptor
     @collection.update query, set(process(model)), safe_mode.merge(upsert_mode false)
   end
 
-  def execute model, command
-    query = { "_id" => model.id }
+  def execute query_or_model, command
+    if query_or_model.respond_to? :id
+      query = { "_id" => query_or_model.id }
+    else
+      query = query_or_model
+    end
     @collection.update query, command, safe_mode.merge(upsert_mode false)
   end
 
