@@ -27,10 +27,10 @@ class MongoAdaptor
   end
 
   def execute query_or_model, command
-    if query_or_model.respond_to? :id
-      query = { "_id" => query_or_model.id }
-    else
+    if query_or_model.is_a? Hash
       query = query_or_model
+    else
+      query = { "_id" => query_or_model.id }
     end
     @collection.update query, command, safe_mode.merge(upsert_mode false)
   end
