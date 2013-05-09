@@ -52,7 +52,7 @@ describe 'adapting structs into mongo' do
         it_should_behave_like 'new model'
       end
       describe 'upserting with a custom operation' do
-        subject { adaptor.execute({ name: 'value' }, { '$push' => { "key" => "value" } }, { :upsert => true }) }
+        subject { adaptor.execute({ :name => 'value' }, { '$push' => { "key" => "value" } }, { :upsert => true }) }
         it_should_behave_like 'creates a document'
         it 'will execute my command' do
           subject
