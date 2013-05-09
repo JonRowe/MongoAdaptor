@@ -88,7 +88,7 @@ describe 'adapting structs into mongo' do
 
       describe 'to update it with a custom operation' do
         let(:data)  { collection.find({}).to_a[-1] }
-        subject { adaptor.execute model, "$addToSet" => { members: "Some Other Members" } }
+        subject { adaptor.execute model, "$addToSet" => { "members" => "Some Other Members" } }
 
         it 'doesnt change the number of items in the collection' do
           expect { subject }.to change { collection.size }.by(0)
