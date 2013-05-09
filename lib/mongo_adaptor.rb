@@ -26,6 +26,11 @@ class MongoAdaptor
     @collection.update query, set(process(model)), safe_mode.merge(upsert_mode false)
   end
 
+  def execute model, command
+    query = { "_id" => model.id }
+    @collection.update query, command, safe_mode.merge(upsert_mode false)
+  end
+
   def fetch selector = {}, opts = { :fields => fields }
     @collection.find_one selector, opts.merge( :transformer => builder )
   end

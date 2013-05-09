@@ -51,8 +51,8 @@ describe 'adapting structs into mongo' do
     end
 
     describe 'with an existing model' do
-      let(:model) { klass.new 'Test Model','Some Data','Some Members' }
-      let(:id)    { collection.insert({ :name => 'My Model', :other => 'Some Value', :members => 'Some Members' },{ :safe => true }) }
+      let(:model) { klass.new 'Test Model','Some Data',['Some Other Members'] }
+      let(:id)    { collection.insert({ :name => 'My Model', :other => 'Some Value', :members => ['Some Members'] },{ :safe => true }) }
 
       before do
         model.id = id
@@ -72,7 +72,7 @@ describe 'adapting structs into mongo' do
           data['_id'].should == model.id
           data['name'].should  == 'Test Model'
           data['other'].should == 'Some Data'
-          data['members'].should == 'Some Members'
+          data['members'].should == ['Some Other Members']
         end
       end
 
@@ -86,13 +86,29 @@ describe 'adapting structs into mongo' do
         it_should_behave_like 'modifying an existing model'
       end
 
+      describe 'to update it with a custom operation' do
+        let(:data)  { collection.find({}).to_a[-1] }
+        subject { adaptor.execute model, "$addToSet" => { members: "Some Other Members" } }
+
+        it 'doesnt change the number of items in the collection' do
+          expect { subject }.to change { collection.size }.by(0)
+        end
+        it 'doesnt change the id' do
+          expect { subject }.to_not change { collection.find_one['_id'] }
+        end
+        it 'executes my command' do
+          subject
+          data['members'].should == ['Some Members','Some Other Members']
+        end
+      end
+
       describe 'to fetch it' do
         subject { adaptor.fetch({ :_id => id }) }
         it            { should be_a klass }
         its(:id)      { should == id }
         its(:name)    { should == 'My Model' }
         its(:other)   { should == 'Some Value' }
-        its(:members) { should == 'Some Members' }
+        its(:members) { should == ['Some Members'] }
       end
 
       describe 'to remove it' do
