@@ -26,13 +26,13 @@ class MongoAdaptor
     @collection.update query, set(process(model)), safe_mode.merge(upsert_mode false)
   end
 
-  def execute query_or_model, command
+  def execute query_or_model, command, options = {}
     if query_or_model.is_a? Hash
       query = query_or_model
     else
       query = { "_id" => query_or_model.id }
     end
-    @collection.update query, command, safe_mode.merge(upsert_mode false)
+    @collection.update query, command, safe_mode.merge(upsert_mode false).merge(options)
   end
 
   def fetch selector = {}, opts = { :fields => fields }

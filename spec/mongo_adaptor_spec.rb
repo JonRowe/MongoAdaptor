@@ -23,7 +23,7 @@ describe 'adapting structs into mongo' do
       let(:model) { klass.new 'Test Model','Some Data','Some Members','fake key'  }
       let(:data)  { collection.find({}).to_a[-1] }
 
-      shared_examples_for 'new model' do
+      shared_examples_for 'creates a document' do
         it 'changes the number of items in the collection' do
           expect { subject }.to change { collection.size }.by(1)
         end
@@ -32,6 +32,9 @@ describe 'adapting structs into mongo' do
           data['_id'].should be_a BSON::ObjectId
           data['id'].should be_nil
         end
+      end
+      shared_examples_for 'new model' do
+        it_should_behave_like 'creates a document'
         it 'sets my fields and values' do
           subject
           data['name'].should  == 'Test Model'
@@ -48,11 +51,19 @@ describe 'adapting structs into mongo' do
         subject { adaptor.upsert model, {} }
         it_should_behave_like 'new model'
       end
+      describe 'upserting with a custom operation' do
+        subject { adaptor.execute({ name: 'value' }, { '$push' => { "key" => "value" } }, { :upsert => true }) }
+        it_should_behave_like 'creates a document'
+        it 'will execute my command' do
+          subject
+          data['key'].should eq ['value']
+        end
+      end
     end
 
     describe 'with an existing model' do
       let(:model) { klass.new 'Test Model','Some Data',['Some Other Members'] }
-      let(:id)    { collection.insert({ :name => 'My Model', :other => 'Some Value', :members => ['Some Members'] },{ :safe => true }) }
+      let(:id)    { collection.insert({ :name => 'My Model', :other => 'Some Value', :members => ['Some Members'] },{ :w => 1 }) }
 
       before do
         model.id = id
