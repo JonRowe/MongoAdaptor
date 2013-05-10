@@ -1,12 +1,8 @@
 require 'mongo_adaptor'
 
 describe 'adapting structs into mongo' do
-  before do
-    Mongo::Configure.from_database 'mongo_adaptor_test'
-  end
-  after do
-    Mongo::Configure.current.load.collections.select { |c| c.name !~ /^system\./ }.each &:remove
-  end
+  before { Mongo::Configure.from_database 'mongo_adaptor_test' }
+  after  { Mongo::Configure.current.load.collections.select { |c| c.name !~ /^system\./ }.each &:remove }
 
   describe 'db setup' do
     it 'uses the configured database' do
@@ -47,10 +43,12 @@ describe 'adapting structs into mongo' do
         subject { adaptor.insert model }
         it_should_behave_like 'new model'
       end
+
       context 'upserting' do
         subject { adaptor.upsert model, {} }
         it_should_behave_like 'new model'
       end
+
       describe 'upserting with a custom operation' do
         subject { adaptor.execute({ :name => 'value' }, { '$push' => { "key" => "value" } }, { :upsert => true }) }
         it_should_behave_like 'creates a document'
