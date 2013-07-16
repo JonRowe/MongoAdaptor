@@ -1,5 +1,5 @@
-[![Build Status](https://secure.travis-ci.org/JonRowe/MongoAdaptor.png)](http://travis-ci.org/JonRowe/MongoAdaptor)
 # MongoAdaptor
+[![Build Status](https://secure.travis-ci.org/JonRowe/MongoAdaptor.png)](http://travis-ci.org/JonRowe/MongoAdaptor) [![Code Climate](https://codeclimate.com/github/JonRowe/MongoAdaptor.png)](https://codeclimate.com/github/JonRowe/MongoAdaptor)
 
 A simple mongo handler. Translates Structs into Mongo and back.
 
