@@ -16,7 +16,6 @@ Gem::Specification.new do |gem|
   gem.version       = MongoAdaptor::VERSION
 
   gem.add_dependency 'mongo'
-  gem.add_dependency 'bson'
   gem.add_dependency 'mongo-configure'
 
   gem.add_development_dependency 'rake'
