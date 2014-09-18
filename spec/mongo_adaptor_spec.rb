@@ -7,7 +7,7 @@ describe 'adapting structs into mongo' do
 
   describe 'db setup' do
     it 'uses the configured database' do
-      MongoAdaptor.db.name.should == 'mongo_adaptor_test'
+      MongoAdaptor.db.name.should eq 'mongo_adaptor_test'
     end
 
     it 'can be configured' do
@@ -41,9 +41,9 @@ describe 'adapting structs into mongo' do
         it_should_behave_like 'creates a document'
         it 'sets my fields and values' do
           subject
-          data['name'].should  == 'Test Model'
-          data['other'].should == 'Some Data'
-          data['members'].should == 'Some Members'
+          data['name'].should  eq 'Test Model'
+          data['other'].should eq 'Some Data'
+          data['members'].should eq 'Some Members'
         end
       end
 
@@ -86,10 +86,10 @@ describe 'adapting structs into mongo' do
         end
         it 'sets my fields and values' do
           subject
-          data['_id'].should == model.id
-          data['name'].should  == 'Test Model'
-          data['other'].should == 'Some Data'
-          data['members'].should == ['Some Other Members']
+          data['_id'].should eq model.id
+          data['name'].should  eq 'Test Model'
+          data['other'].should eq 'Some Data'
+          data['members'].should eq ['Some Other Members']
         end
       end
 
@@ -157,7 +157,7 @@ describe 'adapting structs into mongo' do
         subject.all? { |k| k.is_a? klass }.should be true
       end
       it 'gets them all' do
-        subject.map(&:other).should == [0,1,2]
+        subject.map(&:other).should eq [0,1,2]
       end
       it 'will pass along options' do
         expect { adaptor.find({ :name => 'My Model' },{ :fields => { }}) }.to_not raise_error
