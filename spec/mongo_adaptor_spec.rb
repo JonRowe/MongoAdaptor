@@ -154,7 +154,7 @@ describe 'adapting structs into mongo' do
 
       its(:count) { should == 3 }
       it 'translates all to klass' do
-        subject.all? { |k| k.is_a? klass }.should be_true
+        subject.all? { |k| k.is_a? klass }.should be true
       end
       it 'gets them all' do
         subject.map(&:other).should == [0,1,2]
