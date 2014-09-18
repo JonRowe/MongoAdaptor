@@ -7,7 +7,7 @@ describe 'adapting structs into mongo' do
 
   describe 'db setup' do
     it 'uses the configured database' do
-      MongoAdaptor.db.name.should eq 'mongo_adaptor_test'
+      expect(MongoAdaptor.db.name).to eq 'mongo_adaptor_test'
     end
 
     it 'can be configured' do
@@ -33,17 +33,17 @@ describe 'adapting structs into mongo' do
         end
         it 'generates an _id, ignoring any set key' do
           subject
-          data['_id'].should be_a BSON::ObjectId
-          data['id'].should be_nil
+          expect(data['_id']).to be_a BSON::ObjectId
+          expect(data['id']).to be_nil
         end
       end
       shared_examples_for 'new model' do
         it_should_behave_like 'creates a document'
         it 'sets my fields and values' do
           subject
-          data['name'].should  eq 'Test Model'
-          data['other'].should eq 'Some Data'
-          data['members'].should eq 'Some Members'
+          expect(data['name']).to  eq 'Test Model'
+          expect(data['other']).to eq 'Some Data'
+          expect(data['members']).to eq 'Some Members'
         end
       end
 
@@ -62,7 +62,7 @@ describe 'adapting structs into mongo' do
         it_should_behave_like 'creates a document'
         it 'will execute my command' do
           subject
-          data['key'].should eq ['value']
+          expect(data['key']).to eq ['value']
         end
       end
     end
@@ -86,10 +86,10 @@ describe 'adapting structs into mongo' do
         end
         it 'sets my fields and values' do
           subject
-          data['_id'].should eq model.id
-          data['name'].should  eq 'Test Model'
-          data['other'].should eq 'Some Data'
-          data['members'].should eq ['Some Other Members']
+          expect(data['_id']).to eq model.id
+          expect(data['name']).to  eq 'Test Model'
+          expect(data['other']).to eq 'Some Data'
+          expect(data['members']).to eq ['Some Other Members']
         end
       end
 
@@ -115,17 +115,17 @@ describe 'adapting structs into mongo' do
         end
         it 'executes my command' do
           subject
-          data['members'].should == ['Some Members','Some Other Members']
+          expect(data['members']).to eq ['Some Members','Some Other Members']
         end
         it 'also can execute my command by query' do
           adaptor.execute({ "name" => 'My Model'}, "$push" => { "members" => "Some Other Members" })
-          data['members'].should == ['Some Members','Some Other Members']
+          expect(data['members']).to eq ['Some Members','Some Other Members']
         end
       end
 
       describe 'to fetch it' do
         subject { adaptor.fetch({ :_id => id }) }
-        it            { should be_a klass }
+        it            { is_expected.to be_a klass }
         its(:id)      { should == id }
         its(:name)    { should == 'My Model' }
         its(:other)   { should == 'Some Value' }
@@ -135,7 +135,7 @@ describe 'adapting structs into mongo' do
       describe 'to remove it' do
         it 'removes the document matching the selector' do
           adaptor.remove({ :_id => id })
-          adaptor.fetch({ :_id => id }).should be_nil
+          expect(adaptor.fetch({ :_id => id })).to be_nil
         end
       end
     end
@@ -154,10 +154,10 @@ describe 'adapting structs into mongo' do
 
       its(:count) { should == 3 }
       it 'translates all to klass' do
-        subject.all? { |k| k.is_a? klass }.should be true
+        expect(subject.all? { |k| k.is_a? klass }).to be true
       end
       it 'gets them all' do
-        subject.map(&:other).should eq [0,1,2]
+        expect(subject.map(&:other)).to eq [0,1,2]
       end
       it 'will pass along options' do
         expect { adaptor.find({ :name => 'My Model' },{ :fields => { }}) }.to_not raise_error
