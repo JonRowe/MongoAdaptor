@@ -8,6 +8,13 @@ describe 'adapting structs into mongo' do
     it 'uses the configured database' do
       MongoAdaptor.db.name.should == 'mongo_adaptor_test'
     end
+
+    it 'can be configured' do
+      original = MongoAdaptor.db
+      MongoAdaptor.db = fake = double
+      expect(MongoAdaptor.db).to eq fake
+      MongoAdaptor.db = original
+    end
   end
 
   describe 'using the adaptor' do
@@ -135,10 +142,10 @@ describe 'adapting structs into mongo' do
     describe 'finding multiples' do
       before do
         3.times do |i|
-          collection.insert({ :name => 'My Model', :other => i },{ :safe => true })
+          collection.insert({ :name => 'My Model', :other => i },{ :w => 1 })
         end
         3.times do |i|
-          collection.insert({ :name => 'Other Model', :other => i },{ :safe => true })
+          collection.insert({ :name => 'Other Model', :other => i },{ :w => 1 })
         end
       end
 

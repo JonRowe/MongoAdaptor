@@ -7,6 +7,10 @@ class MongoAdaptor
     def db
       @db ||= Mongo::Configure.current.load
     end
+
+    def db= db
+      @db = db
+    end
   end
 
   def initialize name, klass
