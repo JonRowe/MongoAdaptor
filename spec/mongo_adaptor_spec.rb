@@ -1,3 +1,4 @@
+require 'rspec/its'
 require 'mongo_adaptor'
 
 describe 'adapting structs into mongo' do
