@@ -1,4 +1,3 @@
-require 'rspec/its'
 require 'mongo_adaptor'
 
 describe 'adapting structs into mongo' do
@@ -105,16 +104,16 @@ describe 'adapting structs into mongo' do
 
       describe 'to update it with a custom operation' do
         let(:data)  { collection.find({}).to_a[-1] }
-        subject { adaptor.execute model, "$push" => { "members" => "Some Other Members" } }
+        let(:operation) { adaptor.execute model, "$push" => { "members" => "Some Other Members" } }
 
         it 'doesnt change the number of items in the collection' do
-          expect { subject }.to change { collection.size }.by(0)
+          expect { operation }.to change { collection.size }.by(0)
         end
         it 'doesnt change the id' do
-          expect { subject }.to_not change { collection.find_one['_id'] }
+          expect { operation }.to_not change { collection.find_one['_id'] }
         end
         it 'executes my command' do
-          subject
+          operation
           expect(data['members']).to eq ['Some Members','Some Other Members']
         end
         it 'also can execute my command by query' do
@@ -124,12 +123,17 @@ describe 'adapting structs into mongo' do
       end
 
       describe 'to fetch it' do
-        subject { adaptor.fetch({ :_id => id }) }
-        it            { is_expected.to be_a klass }
-        its(:id)      { should == id }
-        its(:name)    { should == 'My Model' }
-        its(:other)   { should == 'Some Value' }
-        its(:members) { should == ['Some Members'] }
+        let(:result) { adaptor.fetch({ :_id => id }) }
+
+        it "returns a class" do
+          expect(result).to be_a klass
+        end
+        specify "the classes fields are set correctly" do
+          expect(result.id).to      eq id
+          expect(result.name).to    eq 'My Model'
+          expect(result.other).to   eq 'Some Value'
+          expect(result.members).to eq ['Some Members']
+        end
       end
 
       describe 'to remove it' do
@@ -150,14 +154,16 @@ describe 'adapting structs into mongo' do
         end
       end
 
-      subject { adaptor.find({ :name => 'My Model' }) }
+      let(:result) { adaptor.find({ :name => 'My Model' }) }
 
-      its(:count) { should == 3 }
+      it 'returns 3 models' do
+        expect(result.count).to eq 3
+      end
       it 'translates all to klass' do
-        expect(subject.all? { |k| k.is_a? klass }).to be true
+        expect(result.all? { |k| k.is_a? klass }).to be true
       end
       it 'gets them all' do
-        expect(subject.map(&:other)).to eq [0,1,2]
+        expect(result.map(&:other)).to eq [0,1,2]
       end
       it 'will pass along options' do
         expect { adaptor.find({ :name => 'My Model' },{ :fields => { }}) }.to_not raise_error
