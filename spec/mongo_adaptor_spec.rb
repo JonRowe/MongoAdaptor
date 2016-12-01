@@ -2,7 +2,7 @@ require 'mongo_adaptor'
 
 describe 'adapting structs into mongo' do
   before do
-    Mongo::Logger.level = :info
+    Mongo::Logger.level = Logger::ERROR
     Mongo::Configure.from_database 'mongo_adaptor_test'
   end
 
