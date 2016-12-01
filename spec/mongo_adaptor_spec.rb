@@ -1,3 +1,4 @@
+require 'mongo-configure'
 require 'mongo_adaptor'
 
 describe 'adapting structs into mongo' do
