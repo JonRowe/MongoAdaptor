@@ -19,15 +19,15 @@ class MongoAdaptor
   end
 
   def insert model
-    @collection.insert process(model), safe_mode
+    @collection.insert_one process(model), safe_mode
   end
 
   def upsert model, query = { "_id" => model.id }
-    @collection.update query, set(process(model)), safe_mode.merge(upsert_mode true)
+    @collection.update_one query, set(process(model)), safe_mode.merge(upsert_mode true)
   end
 
   def update model, query = { "_id" => model.id }
-    @collection.update query, set(process(model)), safe_mode.merge(upsert_mode false)
+    @collection.update_one query, set(process(model)), safe_mode.merge(upsert_mode false)
   end
 
   def execute query_or_model, command, options = {}
@@ -36,30 +36,31 @@ class MongoAdaptor
     else
       query = { "_id" => query_or_model.id }
     end
-    @collection.update query, command, safe_mode.merge(upsert_mode false).merge(options)
+    @collection.update_one query, command, safe_mode.merge(upsert_mode false).merge(options)
   end
 
   def fetch selector = {}, opts = {}
-    @collection.find_one selector, { :fields => fields, :transformer => builder }.merge(opts)
+    build(@collection.find(selector, { :fields => fields }.merge(opts)).first)
   end
 
   def remove selector = {}, opts = {}
-    @collection.remove selector, opts
+    @collection.delete_many selector, opts
   end
 
   def find selector = {}, opts = {}
-    @collection.find selector, { :fields => fields, :transformer => builder }.merge(opts)
+    @collection.find(selector, { :fields => fields }.merge(opts)).map do |model|
+      build model
+    end
   end
 
   private
 
-    def builder
-      proc do |result|
-        @klass.new.tap do |model|
-          model[:id] = result.delete('_id') if model.respond_to?(:id)
-          result.each do |field,value|
-            model[field] = value if fields.include?(field.to_s)
-          end
+    def build result
+      return unless result
+      @klass.new.tap do |model|
+        model[:id] = result.delete('_id') if model.respond_to?(:id)
+        result.each do |field,value|
+          model[field] = value if fields.include?(field.to_s)
         end
       end
     end

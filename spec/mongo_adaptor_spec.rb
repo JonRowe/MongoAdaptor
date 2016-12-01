@@ -1,9 +1,12 @@
-require 'mongo-configure'
 require 'mongo_adaptor'
 
 describe 'adapting structs into mongo' do
-  before { Mongo::Configure.from_database 'mongo_adaptor_test' }
-  after  { Mongo::Configure.current.load.collections.select { |c| c.name !~ /^system\./ }.each &:remove }
+  before do
+    Mongo::Logger.level = :info
+    Mongo::Configure.from_database 'mongo_adaptor_test'
+  end
+
+  after  { Mongo::Configure.current.load.collections.select { |c| c.name !~ /^system\./ }.each &:delete_many }
 
   describe 'db setup' do
     it 'uses the configured database' do
@@ -29,7 +32,7 @@ describe 'adapting structs into mongo' do
 
       shared_examples_for 'creates a document' do
         it 'changes the number of items in the collection' do
-          expect { subject }.to change { collection.size }.by(1)
+          expect { subject }.to change { collection.count }.by(1)
         end
         it 'generates an _id, ignoring any set key' do
           subject
@@ -69,7 +72,7 @@ describe 'adapting structs into mongo' do
 
     describe 'with an existing model' do
       let(:model) { klass.new 'Test Model','Some Data',['Some Other Members'] }
-      let(:id)    { collection.insert({ :name => 'My Model', :other => 'Some Value', :members => ['Some Members'] },{ :w => 1 }) }
+      let(:id)    { collection.insert_one({ :name => 'My Model', :other => 'Some Value', :members => ['Some Members'] },{ :w => 1 }).inserted_id }
 
       before do
         model.id = id
@@ -79,10 +82,10 @@ describe 'adapting structs into mongo' do
         let(:data)  { collection.find({}).to_a[-1] }
 
         it 'doesnt change the number of items in the collection' do
-          expect { subject }.to change { collection.size }.by(0)
+          expect { subject }.to change { collection.count }.by(0)
         end
         it 'doesnt change the id' do
-          expect { subject }.to_not change { collection.find_one['_id'] }
+          expect { subject }.to_not change { collection.find.first['_id'] }
         end
         it 'sets my fields and values' do
           subject
@@ -108,10 +111,10 @@ describe 'adapting structs into mongo' do
         let(:operation) { adaptor.execute model, "$push" => { "members" => "Some Other Members" } }
 
         it 'doesnt change the number of items in the collection' do
-          expect { operation }.to change { collection.size }.by(0)
+          expect { operation }.to change { collection.count }.by(0)
         end
         it 'doesnt change the id' do
-          expect { operation }.to_not change { collection.find_one['_id'] }
+          expect { operation }.to_not change { collection.find.first['_id'] }
         end
         it 'executes my command' do
           operation
@@ -148,10 +151,10 @@ describe 'adapting structs into mongo' do
     describe 'finding multiples' do
       before do
         3.times do |i|
-          collection.insert({ :name => 'My Model', :other => i },{ :w => 1 })
+          collection.insert_one({ :name => 'My Model', :other => i },{ :w => 1 })
         end
         3.times do |i|
-          collection.insert({ :name => 'Other Model', :other => i },{ :w => 1 })
+          collection.insert_one({ :name => 'Other Model', :other => i },{ :w => 1 })
         end
       end
 
