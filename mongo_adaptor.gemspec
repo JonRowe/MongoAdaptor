@@ -14,6 +14,7 @@ Gem::Specification.new do |gem|
   gem.name          = "mongo_adaptor"
   gem.require_paths = ["lib"]
   gem.version       = MongoAdaptor::VERSION
+  gem.required_ruby_version = '>= 1.9.3'
 
   gem.add_dependency 'mongo', '~> 2.4'
   gem.add_dependency 'mongo-configure', '~> 2.0.0'
